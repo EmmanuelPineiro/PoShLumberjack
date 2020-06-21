@@ -13,7 +13,8 @@ test_script:
 
     ls
 deploy_script:
-- ps: Publish-Module -Name PoShLumberjack -NuGetApiKey $env:NuGetApiKey
+- ps: Publish-Module -Name PoShLumberjack -NuGetApiKey $env:NuGetApiKey -Path '.\PoShLumberjack'
+
 environment:
   NuGetApiKey:
     secure: mlo+xHPV+xO1ROCpy4PbYcUKZP4m44uyUlAzOv7r4oW7qOJkT4B9qQ4CEO42kgf4
