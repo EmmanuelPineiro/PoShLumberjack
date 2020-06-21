@@ -1,4 +1,5 @@
 # PoShLumberjack
+Simple logger that writes to a log file and host
 
 [![Build status](https://ci.appveyor.com/api/projects/status/4loxtsfmwvae8cqc/branch/master?svg=true)](https://ci.appveyor.com/project/EmmanuelPineiro/poshlumberjack/branch/master)
 
