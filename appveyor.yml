@@ -1,9 +1,18 @@
 version: 1.0.{build}
 image: Visual Studio 2019
 build: off
+install:
+  - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
 test_script:
 - ps: >-
-    Write-Host "DID A THING FROM THE FILE"
     $res = Invoke-Pester -Path ".\Tests" -OutputFormat NUnitXml -OutputFile TestsResults.xml -PassThru
+
     (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestsResults.xml))
+
     if ($res.FailedCount -gt 0) { throw "$($res.FailedCount) tests failed."}
+deploy_script:
+- ps: Publish-Module -NuGetApiKey $env:NuGetApiKey -Path '.\PoShLumberjack'
+
+environment:
+  NuGetApiKey:
+    secure: mlo+xHPV+xO1ROCpy4PbYcUKZP4m44uyUlAzOv7r4oW7qOJkT4B9qQ4CEO42kgf4

@@ -56,21 +56,21 @@ function Get-LinePrefix {
       [Parameter(Position=1)][string]$Level="INFO"
   )
 
-  return "[$($dateTime.ToString("yyyyMMddHHmmss"))][$tag]"
+  return "[$($dateTime.ToString("yyyyMMddHHmmss"))][$Level]"
 }
 
 function Write-Log {
   param (
     [Parameter(Mandatory=$true, Position=0)][string]$Message,
-    [Parameter(Position=1)][string]$tag="INFO"
+    [Parameter(Position=1)][string]$Level="INFO"
   )
 
-    $Message = "$(Get-LinePrefix -tag $tag) $Message"
+    $Message = "$(Get-LinePrefix -Level $Level) $Message"
     Add-Content -Path $script:FilePath -Value $Message
-    Write-Host $Message -ForegroundColor $script:LevelColors.$tag
+    Write-Host $Message -ForegroundColor $script:LevelColors.$Level
 }
 
-function Setup-Dir {
+function Confirm-LogDirectory {
   param (
     [Parameter(Position=0)][string]$path="$env:TEMP\PoShLumberjack\"
   )
@@ -98,7 +98,7 @@ function Get-LogFileName {
   return "$BaseFileName-$(Get-Date -Format $DateFormat).$Extension"
 }
 
-function Create-LogFile {
+function New-LogFile {
   param (
     [Parameter(Position=0)][string]$LogFilePath="$env:TEMP\PoShLumberjack\PoShLumberjack.log",
     [Parameter(Position=1)][string]$DateFormat="yyyyMMddHHmmss",
@@ -109,7 +109,7 @@ function Create-LogFile {
     $path = Split-Path $LogFilePath -Parent
     $file = Split-Path $LogFilePath -Leaf
 
-    Setup-Dir $path
+    Confirm-LogDirectory $path
     if (-not $NoDateTime) {
       $file = Get-LogFileName $file $DateFormat
     }
@@ -130,12 +130,12 @@ Writes INFO level message to log file and write-host
 The message to log
 
 .EXAMPLE
-Log-Info "Something waranting info happened!"
+Write-LogI "Something waranting info happened!"
 
 .NOTES
 Default write-host in WHITE. Can be set using Set-LevelTextColor
 #>
-function Log-Info {
+function Write-LogI {
   param (
     [Parameter(Mandatory=$true, Position=0)][string]$Message
   )
@@ -151,12 +151,12 @@ Writes WARN level message to log file and write-host
 The message to log
 
 .EXAMPLE
-Log-Warn "Something waranting WARN happened!"
+Write-LogW "Something waranting WARN happened!"
 
 .NOTES
 Default write-host in YELLOW. Can be set using Set-LevelTextColor
 #>
-function Log-Warn {
+function Write-LogW {
   param (
     [Parameter(Mandatory=$true, Position=0)][string]$Message
   )
@@ -172,12 +172,12 @@ Writes ERROR level message to log file and write-host
 The message to log
 
 .EXAMPLE
-Log-Error "Something waranting ERROR happened!"
+Write-LogE "Something waranting ERROR happened!"
 
 .NOTES
 Default write-host in RED. Can be set using Set-LevelTextColor
 #>
-function Log-Error {
+function Write-LogE {
   param (
     [Parameter(Mandatory=$true, Position=0)][string]$Message
   )
@@ -193,12 +193,12 @@ Writes DEBUG level message to log file and write-host
 The message to log
 
 .EXAMPLE
-Log-Debug "Something waranting DEBUG happened!"
+Write-LogD "Something waranting DEBUG happened!"
 
 .NOTES
 Default write-host in CYAN. Can be set using Set-LevelTextColor
 #>
-function Log-Debug {
+function Write-LogD {
   param (
     [Parameter(Mandatory=$true, Position=0)][string]$Message
   )
@@ -223,7 +223,7 @@ that format.
 Default: "$env:TEMP\PoShLumberjack\log\Lumberjack.log"
 
 .PARAMETER LogNote
-A normal log-Info entry with an added [NOTE] tag just in case you have something of note you 
+A normal Write-logI entry with an added [NOTE] tag just in case you have something of note you 
 want to add. Might be good if you keep a rolling log.
 
 Will show up like this:
@@ -239,7 +239,7 @@ Example: "yyMMdd"
 Doc: https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings
 
 .PARAMETER IsDebug
-By default, debug logging will not write to host or file. Pass the -IsDebug switch to get Log-Debug entries to show
+By default, debug logging will not write to host or file. Pass the -IsDebug switch to get Write-LogD entries to show
 
 .PARAMETER NoDateTime
 If you don't want the log file name to be modified with the date, use the -NoDateTime switch
@@ -250,7 +250,7 @@ Start-Logger -NoDateTime
 Start-Logger -IsDebug
 
 .NOTES
-Log-Debug will only show up if you pass the -IsDebug Switch
+Write-LogD will only show up if you pass the -IsDebug Switch
 #>
 function Start-Logging {
   param (
@@ -265,15 +265,15 @@ function Start-Logging {
   Write-Verbose "Setting up log file..."
   if (-not (Test-Path $LogPath)) {
     Write-Verbose "  Creating log file: $LogPath"
-    $script:FilePath = (Create-LogFile $LogPath $DateFormat $NoDateTime).FullName
+    $script:FilePath = (New-LogFile $LogPath $DateFormat $NoDateTime).FullName
     Write-Verbose "  Created log file: $($script:FilePath)"
   }
   $script:IsDebug = $IsDebug
   Write-Verbose "  Log file setup complete"
   if ($LogNote) {
-    Log-Info "========================"
-    Log-Info "[NOTE] $LogNote"
-    Log-Info "========================"
+    Write-LogI "========================"
+    Write-LogI "[NOTE] $LogNote"
+    Write-LogI "========================"
   }
 }
 #endregion
