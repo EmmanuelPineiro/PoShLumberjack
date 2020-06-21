@@ -56,18 +56,18 @@ function Get-LinePrefix {
       [Parameter(Position=1)][string]$Level="INFO"
   )
 
-  return "[$($dateTime.ToString("yyyyMMddHHmmss"))][$tag]"
+  return "[$($dateTime.ToString("yyyyMMddHHmmss"))][$Level]"
 }
 
 function Write-Log {
   param (
     [Parameter(Mandatory=$true, Position=0)][string]$Message,
-    [Parameter(Position=1)][string]$tag="INFO"
+    [Parameter(Position=1)][string]$Level="INFO"
   )
 
-    $Message = "$(Get-LinePrefix -tag $tag) $Message"
+    $Message = "$(Get-LinePrefix -Level $Level) $Message"
     Add-Content -Path $script:FilePath -Value $Message
-    Write-Host $Message -ForegroundColor $script:LevelColors.$tag
+    Write-Host $Message -ForegroundColor $script:LevelColors.$Level
 }
 
 function Setup-Dir {
