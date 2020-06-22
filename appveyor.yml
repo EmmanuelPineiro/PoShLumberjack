@@ -15,6 +15,8 @@ test_script:
     if ($res.FailedCount -gt 0) { throw "$($res.FailedCount) tests failed."}
 # deploy_script:
 # - ps: if ($($env:APPVEYOR_REPO_BRANCH) -eq 'master') {Publish-Module -NuGetApiKey $env:NuGetApiKey -Path '.\PoShLumberjack'}
+deploy_script:
+- ps: Publish-Module -NuGetApiKey $env:NuGetApiKey -Path '.\PoShLumberjack'
 
 environment:
   NuGetApiKey:
