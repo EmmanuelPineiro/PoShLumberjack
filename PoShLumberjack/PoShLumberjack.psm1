@@ -64,7 +64,10 @@ function Write-Log {
     [Parameter(Mandatory=$true, Position=0)][string]$Message,
     [Parameter(Position=1)][string]$Level="INFO"
   )
-
+    if (($null -eq $script:FilePath) -or -not (Test-Path $script:FilePath)) {
+      $path = "$env:TEMP\PoShLumberjack\log\Lumberjack.log"
+      Start-Logging $path -LogNote "Start-Logging was not called. Creating log: $path" -NoDateTime
+    }
     $Message = "$(Get-LinePrefix -Level $Level) $Message"
     Add-Content -Path $script:FilePath -Value $Message
     Write-Host $Message -ForegroundColor $script:LevelColors.$Level
@@ -115,6 +118,7 @@ function New-LogFile {
     }
     $fullName = Join-Path $path $file
     $log = New-Item -ItemType File -Path $fullName
+    Test-Path $log.FullName | Out-Null
     return $log
   }
 }
